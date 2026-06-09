@@ -59,24 +59,32 @@ export default function CreateTreeModal({ onClose }: { onClose: () => void }) {
         style={{
           position: 'fixed', top: '50%', left: '50%',
           transform: 'translate(-50%, -50%)',
-          width: '100%', maxWidth: 480, zIndex: 101,
-          borderRadius: 16, padding: '2rem',
+          width: 'calc(100% - 2rem)', maxWidth: 460, zIndex: 101,
+          maxHeight: '90dvh',
+          display: 'flex', flexDirection: 'column',
+          borderRadius: 16,
           border: '1px solid rgba(139,92,246,0.2)',
           boxShadow: '0 25px 60px rgba(0,0,0,0.6)',
+          overflow: 'hidden',
         }}
       >
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+        {/* Header — fixed */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '1.25rem 1.5rem',
+          borderBottom: '1px solid var(--border)',
+          flexShrink: 0,
+        }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{
-              width: 36, height: 36, borderRadius: 10,
+              width: 34, height: 34, borderRadius: 10,
               background: `linear-gradient(135deg, ${color}, ${color}aa)`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              transition: 'background 0.2s',
+              transition: 'background 0.2s', flexShrink: 0,
             }}>
-              <TreePine size={18} color="white" />
+              <TreePine size={17} color="white" />
             </div>
-            <h2 style={{ margin: 0, fontFamily: 'Outfit', fontSize: '1.15rem', fontWeight: 700 }}>
+            <h2 style={{ margin: 0, fontFamily: 'Outfit', fontSize: '1.05rem', fontWeight: 700 }}>
               Tạo Tree mới
             </h2>
           </div>
@@ -84,122 +92,120 @@ export default function CreateTreeModal({ onClose }: { onClose: () => void }) {
             onClick={onClose}
             style={{
               background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)',
-              borderRadius: 8, padding: '6px 10px', cursor: 'pointer', color: 'var(--text-muted)',
+              borderRadius: 8, padding: '5px 9px', cursor: 'pointer', color: 'var(--text-muted)',
+              flexShrink: 0,
             }}
           >
-            <X size={16} />
+            <X size={15} />
           </button>
         </div>
 
-        <form onSubmit={handleCreate}>
-          {/* Title */}
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.83rem', color: 'var(--text-secondary)' }}>
-              Tên Tree *
-            </label>
-            <input
-              autoFocus
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="VD: Lộ trình học Machine Learning"
-              required
-              style={{
-                width: '100%', padding: '10px 14px', borderRadius: 8,
-                background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)',
-                color: 'var(--text-primary)', fontSize: '0.9rem', outline: 'none',
-                transition: 'border-color 0.2s',
-              }}
-              onFocus={(e) => (e.target.style.borderColor = 'rgba(139,92,246,0.5)')}
-              onBlur={(e) => (e.target.style.borderColor = 'var(--border)')}
-            />
-          </div>
-
-          {/* Description */}
-          <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.83rem', color: 'var(--text-secondary)' }}>
-              Mô tả (tuỳ chọn)
-            </label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Mô tả ngắn về chủ đề này..."
-              rows={3}
-              style={{
-                width: '100%', padding: '10px 14px', borderRadius: 8,
-                background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)',
-                color: 'var(--text-primary)', fontSize: '0.9rem', outline: 'none',
-                resize: 'vertical', fontFamily: 'inherit', transition: 'border-color 0.2s',
-              }}
-              onFocus={(e) => (e.target.style.borderColor = 'rgba(139,92,246,0.5)')}
-              onBlur={(e) => (e.target.style.borderColor = 'var(--border)')}
-            />
-          </div>
-
-          {/* Color picker */}
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.83rem', color: 'var(--text-secondary)' }}>
-              Màu chủ đề
-            </label>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              {COLORS.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setColor(c)}
-                  style={{
-                    width: 32, height: 32, borderRadius: '50%',
-                    background: c, border: 'none', cursor: 'pointer',
-                    outline: color === c ? `3px solid ${c}` : 'none',
-                    outlineOffset: 2, transition: 'transform 0.15s, outline 0.15s',
-                    transform: color === c ? 'scale(1.2)' : 'scale(1)',
-                  }}
-                />
-              ))}
+        {/* Scrollable body */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '1.25rem 1.5rem' }}>
+          <form id="create-tree-form" onSubmit={handleCreate}>
+            {/* Title */}
+            <div style={{ marginBottom: '0.875rem' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+                Tên Tree *
+              </label>
+              <input
+                autoFocus
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="VD: Lộ trình học Machine Learning"
+                required
+                style={{
+                  width: '100%', padding: '9px 12px', borderRadius: 8,
+                  background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)',
+                  color: 'var(--text-primary)', fontSize: '0.88rem', outline: 'none',
+                  transition: 'border-color 0.2s', boxSizing: 'border-box',
+                }}
+                onFocus={(e) => (e.target.style.borderColor = 'rgba(139,92,246,0.5)')}
+                onBlur={(e) => (e.target.style.borderColor = 'var(--border)')}
+              />
             </div>
-          </div>
 
-          {/* Preview */}
-          <div className="glass" style={{
-            borderRadius: 10, padding: '10px 14px', marginBottom: '1.5rem',
-            border: `1px solid ${color}30`,
-            display: 'flex', alignItems: 'center', gap: '10px',
-          }}>
-            <div style={{
-              width: 10, height: 10, borderRadius: '50%',
-              background: color, boxShadow: `0 0 8px ${color}`,
-            }} />
-            <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
-              Preview: <strong style={{ color: 'var(--text-primary)' }}>{title || 'Tên Tree'}</strong>
-            </span>
-          </div>
+            {/* Description */}
+            <div style={{ marginBottom: '0.875rem' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+                Mô tả (tuỳ chọn)
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Mô tả ngắn về chủ đề này..."
+                rows={2}
+                style={{
+                  width: '100%', padding: '9px 12px', borderRadius: 8,
+                  background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)',
+                  color: 'var(--text-primary)', fontSize: '0.88rem', outline: 'none',
+                  resize: 'none', fontFamily: 'inherit', transition: 'border-color 0.2s',
+                  boxSizing: 'border-box',
+                }}
+                onFocus={(e) => (e.target.style.borderColor = 'rgba(139,92,246,0.5)')}
+                onBlur={(e) => (e.target.style.borderColor = 'var(--border)')}
+              />
+            </div>
 
-          {/* Actions */}
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button
-              type="button"
-              onClick={onClose}
-              style={{
-                flex: 1, padding: '10px', borderRadius: 8, cursor: 'pointer',
-                background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)',
-                color: 'var(--text-secondary)', fontSize: '0.9rem',
-              }}
-            >
-              Huỷ
-            </button>
-            <button
-              type="submit"
-              disabled={!title.trim() || loading}
-              style={{
-                flex: 2, padding: '10px', borderRadius: 8, cursor: 'pointer',
-                background: title.trim() ? `linear-gradient(135deg, ${color}, ${color}cc)` : 'rgba(139,92,246,0.2)',
-                border: 'none', color: 'white', fontSize: '0.9rem', fontWeight: 600,
-                transition: 'background 0.2s',
-              }}
-            >
-              {loading ? 'Đang tạo...' : '🌱 Tạo Tree'}
-            </button>
-          </div>
-        </form>
+            {/* Color picker */}
+            <div>
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+                Màu chủ đề
+              </label>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {COLORS.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setColor(c)}
+                    style={{
+                      width: 28, height: 28, borderRadius: '50%',
+                      background: c, border: 'none', cursor: 'pointer',
+                      outline: color === c ? `3px solid ${c}` : 'none',
+                      outlineOffset: 2, transition: 'transform 0.15s, outline 0.15s',
+                      transform: color === c ? 'scale(1.15)' : 'scale(1)',
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          </form>
+        </div>
+
+        {/* Actions — fixed at bottom */}
+        <div style={{
+          display: 'flex', gap: '10px',
+          padding: '1rem 1.5rem',
+          borderTop: '1px solid var(--border)',
+          flexShrink: 0,
+          background: 'var(--bg-glass)',
+          backdropFilter: 'blur(10px)',
+        }}>
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              flex: 1, padding: '9px', borderRadius: 8, cursor: 'pointer',
+              background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)',
+              color: 'var(--text-secondary)', fontSize: '0.88rem',
+            }}
+          >
+            Huỷ
+          </button>
+          <button
+            type="submit"
+            form="create-tree-form"
+            disabled={!title.trim() || loading}
+            style={{
+              flex: 2, padding: '9px', borderRadius: 8, cursor: loading ? 'not-allowed' : 'pointer',
+              background: title.trim() ? `linear-gradient(135deg, ${color}, ${color}cc)` : 'rgba(139,92,246,0.2)',
+              border: 'none', color: 'white', fontSize: '0.88rem', fontWeight: 600,
+              transition: 'background 0.2s',
+            }}
+          >
+            {loading ? 'Đang tạo...' : '🌱 Tạo Tree'}
+          </button>
+        </div>
       </motion.div>
     </>
   )
