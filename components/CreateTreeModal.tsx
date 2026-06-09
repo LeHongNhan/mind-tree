@@ -16,22 +16,44 @@ export default function CreateTreeModal({ onClose }: { onClose: () => void }) {
   const [description, setDescription] = useState('')
   const [color, setColor] = useState(COLORS[0])
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const { trees, setTrees } = useAppStore()
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!title.trim()) return
+    setError(null)
     setLoading(true)
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    const { data, error } = await supabase
-      .from('trees')
-      .insert({ title: title.trim(), description: description.trim() || null, color, owner_id: user?.id, is_public: true })
-      .select()
-      .single()
-    if (data) {
-      setTrees([data, ...trees])
-      onClose()
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        setError('Chưa đăng nhập. Vui lòng đăng nhập lại.')
+        setLoading(false)
+        return
+      }
+      const { data, error: dbError } = await supabase
+        .from('trees')
+        .insert({ title: title.trim(), description: description.trim() || null, color, owner_id: user.id, is_public: true })
+        .select()
+        .single()
+      if (dbError) {
+        console.error('Supabase error:', dbError)
+        if (dbError.code === '42501' || dbError.message.includes('policy')) {
+          setError('Lỗi quyền truy cập: Tài khoản chưa được set role admin. Vào Supabase → SQL Editor → chạy: UPDATE public.profiles SET role = \'admin\' WHERE id = \'<your-uuid>\';')
+        } else {
+          setError(`Lỗi: ${dbError.message}`)
+        }
+        setLoading(false)
+        return
+      }
+      if (data) {
+        setTrees([data, ...trees])
+        onClose()
+      }
+    } catch (err) {
+      setError('Đã xảy ra lỗi không xác định.')
+      console.error(err)
     }
     setLoading(false)
   }
@@ -171,6 +193,22 @@ export default function CreateTreeModal({ onClose }: { onClose: () => void }) {
             </div>
           </form>
         </div>
+
+        {/* Error message */}
+        {error && (
+          <div style={{
+            margin: '0 1.5rem',
+            padding: '10px 14px',
+            borderRadius: 8,
+            background: 'rgba(239,68,68,0.08)',
+            border: '1px solid rgba(239,68,68,0.25)',
+            color: '#fca5a5',
+            fontSize: '0.8rem',
+            lineHeight: 1.5,
+          }}>
+            ⚠️ {error}
+          </div>
+        )}
 
         {/* Actions — fixed at bottom */}
         <div style={{
