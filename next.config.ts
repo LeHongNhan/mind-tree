@@ -1,14 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ['reactflow'],
+  transpilePackages: ['reactflow', '@reactflow/core', '@reactflow/background', '@reactflow/controls', '@reactflow/minimap'],
   typescript: {
-    // Supabase generic types cause false positives with service role client
-    // Type checking still runs in IDE (tsconfig). Build-time skip is safe here.
     ignoreBuildErrors: true,
   },
-  experimental: {
-    optimizePackageImports: ['lucide-react', 'framer-motion'],
-  },
+  turbopack: {},
 }
 
 export default nextConfig
